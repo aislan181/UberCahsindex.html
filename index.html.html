@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Controle Uber / 99</title>
+  <script src="https://unpkg.com/feather-icons"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    :root {
+      --background: #f8f9fa;
+      --foreground: #1e293b;
+      --card: #ffffff;
+      --card-foreground: #1e293b;
+      --primary: #3b82f6;
+      --primary-foreground: #ffffff;
+      --secondary: #e2e8f0;
+      --secondary-foreground: #1e293b;
+      --muted: #f1f5f9;
+      --muted-foreground: #64748b;
+      --accent: #dbeafe;
+      --accent-foreground: #1e293b;
+      --destructive: #ef4444;
+      --destructive-foreground: #ffffff;
+      --border: #e2e8f0;
+      --input: #e2e8f0;
+      --ring: #3b82f6;
+      --success: #22c55e;
+      --success-foreground: #ffffff;
+      --warning: #f59e0b;
+      --warning-foreground: #ffffff;
+      --radius: 0.75rem;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    }
+
+    .dark {
+      --background: #0f172a;
+      --foreground: #f8fafc;
+      --card: #1e293b;
+      --card-foreground: #f8fafc;
+      --primary: #3b82f6;
+      --primary-foreground: #ffffff;
+      --secondary: #334155;
+      --secondary-foreground: #f8fafc;
+      --muted: #1e293b;
+      --muted-foreground: #94a3b8;
+      --accent: #1e293b;
+      --accent-foreground: #f8fafc;
+      --destructive: #ef4444;
+      --destructive-foreground: #f8fafc;
+      --border: #1e293b;
+      --input: #1e293b;
+      --ring: #3b82f6;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--background);
+      color: var(--foreground);
+      line-height: 1.5;
+      transition: background-color 0.3s, color 0.3s;
+      min-height: 100vh;
+    }
+
+    button {
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 500;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    /* Header */
+    header {
+      background-color: var(--background);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(8px);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      color: var(--foreground);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+
+    .logo svg {
+      margin-right: 0.5rem;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--foreground);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 9999px;
+      transition: background-color 0.2s;
+    }
+
+    .theme-toggle:hover {
+      background-color: var(--secondary);
+    }
+
+    /* Period Tabs */
+    .period-tabs {
+      display: flex;
+      background-color: var(--card);
+      border-radius: var(--radius);
+      margin: 1.25rem 0;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .period-tab {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: 0.875rem 0;
+      font-size: 0.875rem;
+      color: var(--card-foreground);
+      transition: all 0.2s ease;
+    }
+
+    .period-tab:not(:last-child) {
+      border-right: 1px solid var(--border);
+    }
+
+    .period-tab.active {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+      font-weight: 600;
+    }
+
+    /* Current Date */
+    .current-date {
+      text-align: center;
+      margin: 1.25rem 0;
+      color: var(--foreground);
+      font-size: 0.875rem;
+    }
+
+    .current-date span:last-child {
+      font-weight: 600;
+      margin-left: 0.25rem;
+    }
+
+    /* Timer Section */
+    .timer-section {
+      background-color: var(--card);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .timer-display {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--foreground);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer-controls {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    .timer-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.375rem;
+      padding: 0.625rem 1.25rem;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: transform 0.1s, opacity 0.2s;
+    }
+
+    .timer-button:active {
+      transform: scale(0.98);
+    }
+
+    .start-button {
+      background-color: var(--success);
+      color: var(--success-foreground);
+    }
+
+    .start-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pause-button {
+      background-color: var(--warning);
+      color: var(--warning-foreground);
+    }
+
+    .pause-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .reset-button {
+      background-color: var(--destructive);
+      color: var(--destructive-foreground);
+    }
+
+    .reset-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Search Box */
+    .search-box {
+      display: flex;
+      align-items: center;
+      background-color: var(--card);
+      border-radius: var(--radius);
+      padding: 0.75rem 1.25rem;
+      margin: 1.25rem 0;
+      box-shadow: var(--shadow);
+    }
+
+    .search-box svg {
+      color: var(--muted-foreground);
+      margin-right: 0.75rem;
+    }
+
+    .search-box input {
+      border: none;
+      background: none;
+      flex: 1;
+      font-size: 0.875rem;
+      color: var(--foreground);
+      outline: none;
+      font-family: inherit;
+    }
+
+    /* Goal Section */
+    .goal-section {
+      background-color: var(--card);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+      box-shadow: var(--shadow);
+    }
+
+    .goal-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--muted-foreground);
+      margin-bottom: 0.5rem;
+    }
+
+    .goal-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 1rem;
+    }
+
+    .goal-progress {
+      margin-top: 0.75rem;
+    }
+
+    .progress-bar {
+      height: 0.625rem;
+      background-color: var(--secondary);
+      border-radius: 9999px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: var(--primary);
+      border-radius: 9999px;
+      transition: width 0.5s ease;
+    }
+
+    .progress-text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--muted-foreground);
+    }
+
+    /* Financial Summary */
+    .financial-summary {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin: 1.75rem 0;
+    }
+
+    .summary-card {
+      padding: 1.25rem;
+      border-radius: var(--radius);
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s;
+    }
+
+    .summary-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .earnings-card {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+    }
+
+    .expenses-card {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+    }
+
+    .fuel-card {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+    }
+
+    .balance-card {
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+      color: white;
+    }
+
+    .card-title {
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      opacity: 0.9;
+    }
+
+    .card-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin: 1.75rem 0;
+    }
+
+    .stat-card {
+      background-color: var(--card);
+      border-radius: var(--radius);
+      padding: 1.25rem 0.75rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .stat-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 0.375rem;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--muted-foreground);
+      font-weight: 500;
+    }
+
+    /* Entries Section */
+    .entries-section {
+      margin: 2rem 0;
+    }
+
+    .entries-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .entries-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--foreground);
+    }
+
+    .filter-dropdown {
+      position: relative;
+    }
+
+    .filter-button {
+      background-color: var(--secondary);
+      color: var(--secondary-foreground);
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      padding: 0.625rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: var(--shadow);
+      transition: background-color 0.2s;
+    }
+
+    .filter-button:hover {
+      background-color: var(--accent);
+    }
+
+    .filter-menu {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background-color: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      min-width: 10rem;
+      z-index: 10;
+      margin-top: 0.375rem;
+      display: none;
+      overflow: hidden;
+    }
+
+    .filter-menu.open {
+      display: block;
+    }
+
+    .filter-item {
+      padding: 0.75rem 1.25rem;
+      cursor: pointer;
+      color: var(--card-foreground);
+      transition: background-color 0.2s;
+    }
+
+    .filter-item:hover {
+      background-color: var(--accent);
+    }
+
+    .filter-item.active {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+      font-weight: 600;
+    }
+
+    .entries-list {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .entry-card {
+      background-color: var(--card);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s;
+    }
+
+    .entry-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .entry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.25rem;
+    }
+
+    .entry-date {
+      font-size: 0.875rem;
+      color: var(--muted-foreground);
+      font-weight: 500;
+    }
+
+    .entry-amount {
+      font-weight: 700;
+      color: var(--foreground);
+      font-size: 1.125rem;
+    }
+
+    .amount-positive {
+      color: var(--success);
+    }
+
+    .amount-negative {
+      color: var(--destructive);
+    }
+
+    .entry-details {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem 1.25rem;
+    }
+
+    .entry-detail {
+      font-size: 0.875rem;
+    }
+
+    .entry-detail-label {
+      color: var(--muted-foreground);
+      font-weight: 500;
+    }
+
+    .entry-detail-value {
+      font-weight: 600;
+      color: var(--foreground);
+    }
+
+    .entry-note {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.875rem;
+      color: var(--muted-foreground);
+    }
+
+    .entry-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+    }
+
+    .entry-button {
+      background-color: var(--secondary);
+      color: var(--secondary-foreground);
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.75rem;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .entry-button:active {
+      transform: scale(0.98);
+    }
+
+    .entry-button-edit:hover {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+    .entry-button-delete:hover {
+      background-color: var(--destructive);
+      color: var(--destructive-foreground);
+    }
+
+    .empty-entries {
+      text-align: center;
+      padding: 3.5rem 1.5rem;
+      color: var(--muted-foreground);
+      background-color: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .empty-entries h3 {
+      font-size: 1.125rem;
+      margin-bottom: 0.5rem;
+      color: var(--foreground);
+    }
+
+    .empty-entries p {
+      font-size: 0.875rem;
+    }
+
+    /* Add Button */
+    .add-button {
+      position: fixed;
+      right: 1.5rem;
+      bottom: 1.5rem;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: var(--primary-foreground);
+      border: none;
+      border-radius: 9999px;
+      width: 3.75rem;
+      height: 3.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.2);
+      z-index: 50;
+      transition: transform 0.2s;
+    }
+
+    .add-button:hover {
+      transform: translateY(-2px);
+    }
+
+    .add-button:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    /* Settings Button */
+    .settings-button {
+      position: fixed;
+      right: 1.5rem;
+      bottom: 6.25rem;
+      background-color: var(--secondary);
+      color: var(--secondary-foreground);
+      border: none;
+      border-radius: 9999px;
+      width: 3.75rem;
+      height: 3.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: var(--shadow);
+      z-index: 50;
+      transition: transform 0.2s;
+    }
+
+    .settings-button:hover {
+      transform: translateY(-2px);
+    }
+
+    .settings-button:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    /* Form */
+    .form-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+
+    .form-overlay.open {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .entry-form {
+      background-color: var(--background);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.75rem;
+    }
+
+    .form-title {
+      font-size: 1.375rem;
+      font-weight: 700;
+      color: var(--foreground);
+    }
+
+    .close-button {
+      background: none;
+      border: none;
+      color: var(--muted-foreground);
+      font-size: 1.75rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .close-button:hover {
+      color: var(--foreground);
+    }
+
+    .form-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.75rem;
+    }
+
+    .form-tab {
+      background: none;
+      border: none;
+      padding: 0.875rem 1.25rem;
+      font-size: 0.875rem;
+      color: var(--muted-foreground);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .form-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      font-weight: 600;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--foreground);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 1px solid var(--input);
+      border-radius: var(--radius);
+      background-color: var(--background);
+      color: var(--foreground);
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--ring);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    }
+
+    .form-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1.75rem;
+    }
+
+    .cancel-button {
+      background-color: var(--secondary);
+      color: var(--secondary-foreground);
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.75rem 1.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .cancel-button:hover {
+      background-color: var(--accent);
+    }
+
+    .cancel-button:active {
+      transform: scale(0.98);
+    }
+
+    .submit-button {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: var(--primary-foreground);
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.75rem 1.75rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2), 0 2px 4px -1px rgba(59, 130, 246, 0.1);
+    }
+
+    .submit-button:hover {
+      box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.2);
+    }
+
+    .submit-button:active {
+      transform: scale(0.98);
+    }
+
+    /* Settings Panel */
+    .settings-panel {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 100%;
+      max-width: 400px;
+      height: 100%;
+      background-color: var(--background);
+      box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      transition: right 0.3s ease;
+      overflow-y: auto;
+    }
+
+    .settings-panel.open {
+      right: 0;
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .settings-header h2 {
+      font-size: 1.375rem;
+      font-weight: 700;
+      color: var(--foreground);
+    }
+
+    .settings-content {
+      padding: 1.75rem;
+    }
+
+    .settings-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .settings-section h3 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 1.25rem;
+    }
+
+    .settings-save-button {
+      width: 100%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: var(--primary-foreground);
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.875rem;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-top: 1.25rem;
+      transition: transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2), 0 2px 4px -1px rgba(59, 130, 246, 0.1);
+    }
+
+    .settings-save-button:hover {
+      box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.2);
+    }
+
+    .settings-save-button:active {
+      transform: scale(0.98);
+    }
+
+    /* Media Queries */
+    @media (min-width: 640px) {
+      .financial-summary {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-content">
+      <a href="#" class="logo">
+        <i data-feather="clipboard"></i>
+        <span>Meu Controle</span>
+      </a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">
+        <i data-feather="moon"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Period Navigation -->
+    <div class="period-tabs">
+      <button class="period-tab active" data-period="daily">Diário</button>
+      <button class="period-tab" data-period="weekly">Semanal</button>
+      <button class="period-tab" data-period="monthly">Mensal</button>
+      <button class="period-tab" data-period="yearly">Anual</button>
+    </div>
+
+    <!-- Current Date Display -->
+    <div class="current-date">
+      <span>Hoje é dia</span>
+      <span id="currentDate"></span>
+    </div>
+
+    <!-- Timer Control Section -->
+    <div class="timer-section">
+      <div class="timer-display" id="timerDisplay">00:00:00</div>
+      <div class="timer-controls">
+        <button id="startTimer" class="timer-button start-button">
+          <i data-feather="play"></i>
+          <span>Iniciar</span>
+        </button>
+        <button id="pauseTimer" class="timer-button pause-button" disabled>
+          <i data-feather="pause"></i>
+          <span>Pausar</span>
+        </button>
+        <button id="resetTimer" class="timer-button reset-button" disabled>
+          <i data-feather="refresh-cw"></i>
+          <span>Zerar</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Box -->
+    <div class="search-box">
+      <i data-feather="search"></i>
+      <input type="text" placeholder="Pesquise aqui" id="searchInput">
+    </div>
+
+    <!-- Goal Section -->
+    <div class="goal-section">
+      <div class="goal-label">Meta do dia</div>
+      <div class="goal-value" id="goalValue">R$ -</div>
+      <div class="goal-progress">
+        <div class="progress-bar">
+          <div class="progress-fill" id="goalProgressFill" style="width: 0%"></div>
+        </div>
+        <div class="progress-text">
+          <span id="goalCompletionPercent">0% Completo</span>
+          <span id="goalRemainingValue">R$ -</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Financial Summary Cards -->
+    <div class="financial-summary">
+      <div class="summary-card earnings-card">
+        <div class="card-title">Faturamento</div>
+        <div class="card-value" id="dailyEarnings">R$ -</div>
+      </div>
+      <div class="summary-card fuel-card">
+        <div class="card-title">Combustível</div>
+        <div class="card-value" id="dailyFuel">R$ -</div>
+      </div>
+      <div class="summary-card expenses-card">
+        <div class="card-title">Outras Despesas</div>
+        <div class="card-value" id="dailyExpenses">R$ -</div>
+      </div>
+      <div class="summary-card balance-card">
+        <div class="card-title">Lucro Líquido</div>
+        <div class="card-value" id="dailyBalance">R$ -</div>
+      </div>
+    </div>
+
+    <!-- Trip Statistics -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="totalTrips">0</div>
+        <div class="stat-label">Total de Viagens</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="dailyTrips">0</div>
+        <div class="stat-label">Viagens Hoje</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="hoursWorked">00:00</div>
+        <div class="stat-label">Horas trabalhadas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="kmDriven">0.00</div>
+        <div class="stat-label">KM Rodados</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="earningsPerTrip">R$ -</div>
+        <div class="stat-label">Fat. por viagem</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="earningsPerHour">R$ -</div>
+        <div class="stat-label">Fat. por hora</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="earningsPerKm">R$ -</div>
+        <div class="stat-label">Fat. por KM</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="netEarningsPerKm">R$ -</div>
+        <div class="stat-label">Lucro por KM</div>
+      </div>
+    </div>
+
+    <!-- Entries Section -->
+    <div class="entries-section">
+      <div class="entries-header">
+        <h2 class="entries-title">Registros</h2>
+        <div class="filter-dropdown">
+          <button class="filter-button" id="filterButton">
+            <i data-feather="filter"></i>
+            <span>Filtrar</span>
+          </button>
+          <div class="filter-menu" id="filterMenu">
+            <div class="filter-item active" data-filter="all">Todos</div>
+            <div class="filter-item" data-filter="trip">Viagens</div>
+            <div class="filter-item" data-filter="expense">Despesas</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="entries-list" id="entriesList">
+        <!-- Entries will be added here dynamically -->
+        <div class="empty-entries" id="emptyEntries">
+          <i data-feather="inbox" style="width: 48px; height: 48px; margin-bottom: 1rem;"></i>
+          <h3>Nenhum registro encontrado</h3>
+          <p>Adicione um registro clicando no botão abaixo</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Button -->
+    <button class="add-button" id="addButton">
+      <i data-feather="plus"></i>
+    </button>
+
+    <!-- Trip Form Overlay -->
+    <div class="form-overlay" id="tripFormOverlay">
+      <div class="entry-form">
+        <div class="form-header">
+          <h2 class="form-title" id="formTitle">Adicionar Viagem</h2>
+          <button class="close-button" id="closeFormButton">&times;</button>
+        </div>
+        <form id="entryForm">
+          <input type="hidden" id="entryId">
+          <input type="hidden" id="entryType" value="trip">
+          
+          <div class="form-tabs">
+            <button type="button" class="form-tab active" data-type="trip">Viagem</button>
+            <button type="button" class="form-tab" data-type="expense">Despesa</button>
+          </div>
+          
+          <div class="form-group" id="dateGroup">
+            <label class="form-label" for="entryDate">Data</label>
+            <input type="date" id="entryDate" class="form-input" required>
+          </div>
+
+          <!-- Trip Form Fields -->
+          <div id="tripFields">
+            <div class="form-group">
+              <label class="form-label" for="tripEarnings">Ganhos (R$)</label>
+              <input type="number" id="tripEarnings" class="form-input" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tripFuelCost">Gasto com combustível (R$)</label>
+              <input type="number" id="tripFuelCost" class="form-input" step="0.01" min="0" value="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tripKilometers">Quilômetros rodados</label>
+              <input type="number" id="tripKilometers" class="form-input" step="0.1" min="0" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tripDuration">Duração (minutos)</label>
+              <input type="number" id="tripDuration" class="form-input" min="1" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tripCount">Quantidade de viagens</label>
+              <input type="number" id="tripCount" class="form-input" min="1" value="1" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tripPlatform">Plataforma</label>
+              <select id="tripPlatform" class="form-input" required>
+                <option value="uber">Uber</option>
+                <option value="99">99</option>
+                <option value="other">Outra</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tripNotes">Observações</label>
+              <textarea id="tripNotes" class="form-input" rows="2"></textarea>
+            </div>
+          </div>
+
+          <!-- Expense Form Fields -->
+          <div id="expenseFields" style="display: none;">
+            <div class="form-group">
+              <label class="form-label" for="expenseAmount">Valor (R$)</label>
+              <input type="number" id="expenseAmount" class="form-input" step="0.01" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="expenseCategory">Categoria</label>
+              <select id="expenseCategory" class="form-input">
+                <option value="fuel">Combustível</option>
+                <option value="maintenance">Manutenção</option>
+                <option value="food">Alimentação</option>
+                <option value="carWash">Lavagem</option>
+                <option value="toll">Pedágio</option>
+                <option value="other">Outra</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="expenseNotes">Detalhes</label>
+              <textarea id="expenseNotes" class="form-input" rows="2"></textarea>
+            </div>
+          </div>
+
+          <div class="form-buttons">
+            <button type="button" class="cancel-button" id="cancelFormButton">Cancelar</button>
+            <button type="submit" class="submit-button" id="submitFormButton">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Settings Button and Panel -->
+    <button class="settings-button" id="settingsButton">
+      <i data-feather="settings"></i>
+    </button>
+
+    <div class="settings-panel" id="settingsPanel">
+      <div class="settings-header">
+        <h2>Configurações</h2>
+        <button class="close-button" id="closeSettingsButton">&times;</button>
+      </div>
+      <div class="settings-content">
+        <div class="settings-section">
+          <h3>Metas</h3>
+          <div class="form-group">
+            <label class="form-label" for="dailyGoalInput">Meta diária (R$)</label>
+            <input type="number" id="dailyGoalInput" class="form-input" step="0.01" min="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="weeklyGoalInput">Meta semanal (R$)</label>
+            <input type="number" id="weeklyGoalInput" class="form-input" step="0.01" min="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="monthlyGoalInput">Meta mensal (R$)</label>
+            <input type="number" id="monthlyGoalInput" class="form-input" step="0.01" min="0">
+          </div>
+        </div>
+        <div class="settings-section">
+          <h3>Preferências</h3>
+          <div class="form-group">
+            <label class="form-label" for="themeSelect">Tema</label>
+            <select id="themeSelect" class="form-input">
+              <option value="light">Claro</option>
+              <option value="dark">Escuro</option>
+              <option value="system">Sistema</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="currencySelect">Moeda</label>
+            <select id="currencySelect" class="form-input">
+              <option value="BRL">Real (R$)</option>
+              <option value="USD">Dólar (US$)</option>
+              <option value="EUR">Euro (€)</option>
+            </select>
+          </div>
+        </div>
+        <button class="settings-save-button" id="saveSettingsButton">Salvar configurações</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Constants
+    const STORAGE_KEY = 'ride_share_tracker_data';
+    const SETTINGS_KEY = 'ride_share_tracker_settings';
+    const TIMER_KEY = 'ride_share_timer_data';
+
+    // State
+    let state = {
+      currentPeriod: 'daily',
+      currentDate: new Date(),
+      entries: [],
+      filter: 'all',
+      editingId: null,
+      timer: {
+        startTime: null,
+        elapsedTime: 0,
+        isRunning: false
+      },
+      timerInterval: null
+    };
+
+    // DOM Elements
+    const elements = {
+      // Date Elements
+      currentDateEl: document.getElementById('currentDate'),
+      
+      // Period Tabs
+      periodTabs: document.querySelectorAll('.period-tab'),
+      
+      // Timer Elements
+      timerDisplay: document.getElementById('timerDisplay'),
+      startTimerBtn: document.getElementById('startTimer'),
+      pauseTimerBtn: document.getElementById('pauseTimer'),
+      resetTimerBtn: document.getElementById('resetTimer'),
+      
+      // Search and Filter
+      searchInput: document.getElementById('searchInput'),
+      filterButton: document.getElementById('filterButton'),
+      filterMenu: document.getElementById('filterMenu'),
+      filterItems: document.querySelectorAll('.filter-item'),
+      
+      // Goals
+      goalValue: document.getElementById('goalValue'),
+      goalProgressFill: document.getElementById('goalProgressFill'),
+      goalCompletionPercent: document.getElementById('goalCompletionPercent'),
+      goalRemainingValue: document.getElementById('goalRemainingValue'),
+      
+      // Financial Summary
+      dailyEarnings: document.getElementById('dailyEarnings'),
+      dailyFuel: document.getElementById('dailyFuel'),
+      dailyExpenses: document.getElementById('dailyExpenses'),
+      dailyBalance: document.getElementById('dailyBalance'),
+      
+      // Statistics
+      totalTrips: document.getElementById('totalTrips'),
+      dailyTrips: document.getElementById('dailyTrips'),
+      hoursWorked: document.getElementById('hoursWorked'),
+      kmDriven: document.getElementById('kmDriven'),
+      earningsPerTrip: document.getElementById('earningsPerTrip'),
+      earningsPerHour: document.getElementById('earningsPerHour'),
+      earningsPerKm: document.getElementById('earningsPerKm'),
+      netEarningsPerKm: document.getElementById('netEarningsPerKm'),
+      
+      // Entries
+      entriesList: document.getElementById('entriesList'),
+      emptyEntries: document.getElementById('emptyEntries'),
+      
+      // Form
+      addButton: document.getElementById('addButton'),
+      tripFormOverlay: document.getElementById('tripFormOverlay'),
+      closeFormButton: document.getElementById('closeFormButton'),
+      cancelFormButton: document.getElementById('cancelFormButton'),
+      entryForm: document.getElementById('entryForm'),
+      formTitle: document.getElementById('formTitle'),
+      entryId: document.getElementById('entryId'),
+      entryType: document.getElementById('entryType'),
+      entryDate: document.getElementById('entryDate'),
+      formTabs: document.querySelectorAll('.form-tab'),
+      tripFields: document.getElementById('tripFields'),
+      expenseFields: document.getElementById('expenseFields'),
+      
+      // Trip Form Fields
+      tripEarnings: document.getElementById('tripEarnings'),
+      tripFuelCost: document.getElementById('tripFuelCost'),
+      tripKilometers: document.getElementById('tripKilometers'),
+      tripDuration: document.getElementById('tripDuration'),
+      tripCount: document.getElementById('tripCount'),
+      tripPlatform: document.getElementById('tripPlatform'),
+      tripNotes: document.getElementById('tripNotes'),
+      
+      // Expense Form Fields
+      expenseAmount: document.getElementById('expenseAmount'),
+      expenseCategory: document.getElementById('expenseCategory'),
+      expenseNotes: document.getElementById('expenseNotes'),
+      
+      // Settings
+      settingsButton: document.getElementById('settingsButton'),
+      settingsPanel: document.getElementById('settingsPanel'),
+      closeSettingsButton: document.getElementById('closeSettingsButton'),
+      dailyGoalInput: document.getElementById('dailyGoalInput'),
+      weeklyGoalInput: document.getElementById('weeklyGoalInput'),
+      monthlyGoalInput: document.getElementById('monthlyGoalInput'),
+      themeSelect: document.getElementById('themeSelect'),
+      currencySelect: document.getElementById('currencySelect'),
+      saveSettingsButton: document.getElementById('saveSettingsButton'),
+      
+      // Theme Toggle
+      themeToggle: document.getElementById('themeToggle')
+    };
+
+    // Settings
+    let settings = {
+      goals: {
+        daily: 200,
+        weekly: 1400,
+        monthly: 6000
+      },
+      theme: 'light',
+      currency: 'BRL'
+    };
+
+    // Initialization
+    function initApp() {
+      loadData();
+      loadSettings();
+      loadTimerData();
+      updateCurrentDate();
+      initEventListeners();
+      applyTheme();
+      updateDisplay();
+    }
+
+    // Load and Save Data
+    function loadData() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      if (data) {
+        try {
+          state.entries = JSON.parse(data);
+        } catch (error) {
+          console.error("Error loading data:", error);
+          state.entries = [];
+        }
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.entries));
+    }
+
+    function loadSettings() {
+      const data = localStorage.getItem(SETTINGS_KEY);
+      if (data) {
+        try {
+          settings = JSON.parse(data);
+          
+          // Update form values
+          elements.dailyGoalInput.value = settings.goals.daily;
+          elements.weeklyGoalInput.value = settings.goals.weekly;
+          elements.monthlyGoalInput.value = settings.goals.monthly;
+          elements.themeSelect.value = settings.theme;
+          elements.currencySelect.value = settings.currency;
+        } catch (error) {
+          console.error("Error loading settings:", error);
+        }
+      }
+    }
+
+    function saveSettings() {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    }
+
+    function loadTimerData() {
+      const data = localStorage.getItem(TIMER_KEY);
+      if (data) {
+        try {
+          const timerData = JSON.parse(data);
+          state.timer = timerData;
+          
+          // If timer was running when page was closed, restart it
+          if (state.timer.isRunning) {
+            const now = new Date().getTime();
+            const timePassedSinceLastSave = now - timerData.lastSaved;
+            state.timer.elapsedTime += timePassedSinceLastSave;
+            startTimer();
+          }
+          
+          updateTimerDisplay();
+        } catch (error) {
+          console.error("Error loading timer data:", error);
+          state.timer = {
+            startTime: null,
+            elapsedTime: 0,
+            isRunning: false
+          };
+        }
+      }
+    }
+
+    function saveTimerData() {
+      const timerData = {
+        ...state.timer,
+        lastSaved: new Date().getTime()
+      };
+      localStorage.setItem(TIMER_KEY, JSON.stringify(timerData));
+    }
+
+    // Event Listeners
+    function initEventListeners() {
+      // Period tabs
+      elements.periodTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          state.currentPeriod = tab.dataset.period;
+          
+          // Update active tab
+          elements.periodTabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          
+          updateDisplay();
+        });
+      });
+      
+      // Timer Controls
+      elements.startTimerBtn.addEventListener('click', startTimer);
+      elements.pauseTimerBtn.addEventListener('click', pauseTimer);
+      elements.resetTimerBtn.addEventListener('click', resetTimer);
+      
+      // Filter
+      elements.filterButton.addEventListener('click', () => {
+        elements.filterMenu.classList.toggle('open');
+      });
+      
+      elements.filterItems.forEach(item => {
+        item.addEventListener('click', () => {
+          state.filter = item.dataset.filter;
+          
+          // Update active filter
+          elements.filterItems.forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          
+          // Close filter menu
+          elements.filterMenu.classList.remove('open');
+          
+          // Update entries list
+          renderEntries();
+        });
+      });
+      
+      // Search
+      elements.searchInput.addEventListener('input', renderEntries);
+      
+      // Form
+      elements.addButton.addEventListener('click', openAddForm);
+      elements.closeFormButton.addEventListener('click', closeForm);
+      elements.cancelFormButton.addEventListener('click', closeForm);
+      
+      elements.entryForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleFormSubmit();
+      });
+      
+      // Form Tabs
+      elements.formTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const type = tab.dataset.type;
+          elements.entryType.value = type;
+          
+          // Update active tab
+          elements.formTabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          
+          // Show/hide appropriate fields
+          if (type === 'trip') {
+            elements.tripFields.style.display = 'block';
+            elements.expenseFields.style.display = 'none';
+            elements.formTitle.textContent = state.editingId ? 'Editar Viagem' : 'Adicionar Viagem';
+          } else {
+            elements.tripFields.style.display = 'none';
+            elements.expenseFields.style.display = 'block';
+            elements.formTitle.textContent = state.editingId ? 'Editar Despesa' : 'Adicionar Despesa';
+          }
+        });
+      });
+      
+      // Settings
+      elements.settingsButton.addEventListener('click', () => {
+        elements.settingsPanel.classList.add('open');
+      });
+      
+      elements.closeSettingsButton.addEventListener('click', () => {
+        elements.settingsPanel.classList.remove('open');
+      });
+      
+      elements.saveSettingsButton.addEventListener('click', () => {
+        // Update settings
+        settings.goals.daily = parseFloat(elements.dailyGoalInput.value) || 0;
+        settings.goals.weekly = parseFloat(elements.weeklyGoalInput.value) || 0;
+        settings.goals.monthly = parseFloat(elements.monthlyGoalInput.value) || 0;
+        settings.theme = elements.themeSelect.value;
+        settings.currency = elements.currencySelect.value;
+        
+        // Save settings
+        saveSettings();
+        
+        // Apply theme
+        applyTheme();
+        
+        // Update display
+        updateDisplay();
+        
+        // Close settings panel
+        elements.settingsPanel.classList.remove('open');
+      });
+      
+      // Theme toggle
+      elements.themeToggle.addEventListener('click', () => {
+        settings.theme = document.body.classList.contains('dark') ? 'light' : 'dark';
+        applyTheme();
+        saveSettings();
+      });
+      
+      // Close filter menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.filter-dropdown') && elements.filterMenu.classList.contains('open')) {
+          elements.filterMenu.classList.remove('open');
+        }
+      });
+      
+      // Window events to save timer data
+      window.addEventListener('beforeunload', saveTimerData);
+    }
+
+    // Timer Functions
+    function startTimer() {
+      if (!state.timer.isRunning) {
+        state.timer.isRunning = true;
+        if (!state.timer.startTime) {
+          state.timer.startTime = new Date().getTime() - state.timer.elapsedTime;
+        }
+        
+        state.timerInterval = setInterval(() => {
+          state.timer.elapsedTime = new Date().getTime() - state.timer.startTime;
+          updateTimerDisplay();
+        }, 1000);
+        
+        // Update button states
+        elements.startTimerBtn.disabled = true;
+        elements.pauseTimerBtn.disabled = false;
+        elements.resetTimerBtn.disabled = false;
+      }
+    }
+
+    function pauseTimer() {
+      if (state.timer.isRunning) {
+        state.timer.isRunning = false;
+        clearInterval(state.timerInterval);
+        
+        // Update button states
+        elements.startTimerBtn.disabled = false;
+        elements.pauseTimerBtn.disabled = true;
+        
+        // Save timer data
+        saveTimerData();
+      }
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      state.timer = {
+        startTime: null,
+        elapsedTime: 0,
+        isRunning: false
+      };
+      
+      updateTimerDisplay();
+      
+      // Update button states
+      elements.startTimerBtn.disabled = false;
+      elements.pauseTimerBtn.disabled = true;
+      elements.resetTimerBtn.disabled = true;
+      
+      // Save timer data
+      saveTimerData();
+    }
+
+    function updateTimerDisplay() {
+      const hours = Math.floor(state.timer.elapsedTime / (1000 * 60 * 60));
+      const minutes = Math.floor((state.timer.elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((state.timer.elapsedTime % (1000 * 60)) / 1000);
+      
+      elements.timerDisplay.textContent = 
+        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      
+      // Update total hours worked
+      const totalMinutes = Math.floor(state.timer.elapsedTime / (1000 * 60));
+      const hoursFormatted = Math.floor(totalMinutes / 60).toString().padStart(2, '0');
+      const minutesFormatted = (totalMinutes % 60).toString().padStart(2, '0');
+      elements.hoursWorked.textContent = `${hoursFormatted}:${minutesFormatted}`;
+    }
+
+    // Form Functions
+    function openAddForm() {
+      // Reset form
+      elements.entryForm.reset();
+      elements.entryId.value = '';
+      state.editingId = null;
+      
+      // Set default date to today
+      const today = new Date().toISOString().split('T')[0];
+      elements.entryDate.value = today;
+      
+      // Reset form tabs and fields
+      elements.formTabs.forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.dataset.type === 'trip') {
+          tab.classList.add('active');
+        }
+      });
+      elements.entryType.value = 'trip';
+      elements.tripFields.style.display = 'block';
+      elements.expenseFields.style.display = 'none';
+      
+      // Update form title
+      elements.formTitle.textContent = 'Adicionar Viagem';
+      
+      // Open overlay
+      elements.tripFormOverlay.classList.add('open');
+    }
+
+    function openEditForm(entry) {
+      // Reset form
+      elements.entryForm.reset();
+      elements.entryId.value = entry.id;
+      state.editingId = entry.id;
+      
+      // Set date
+      elements.entryDate.value = entry.date;
+      
+      // Set form type
+      elements.entryType.value = entry.type;
+      
+      // Update form tabs and fields
+      elements.formTabs.forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.dataset.type === entry.type) {
+          tab.classList.add('active');
+        }
+      });
+      
+      if (entry.type === 'trip') {
+        elements.tripFields.style.display = 'block';
+        elements.expenseFields.style.display = 'none';
+        
+        // Fill trip fields
+        elements.tripEarnings.value = entry.earnings;
+        elements.tripFuelCost.value = entry.fuelCost || 0;
+        elements.tripKilometers.value = entry.kilometers;
+        elements.tripDuration.value = entry.duration;
+        elements.tripCount.value = entry.tripCount || 1;
+        elements.tripPlatform.value = entry.platform;
+        elements.tripNotes.value = entry.notes || '';
+        
+        // Update form title
+        elements.formTitle.textContent = 'Editar Viagem';
+      } else {
+        elements.tripFields.style.display = 'none';
+        elements.expenseFields.style.display = 'block';
+        
+        // Fill expense fields
+        elements.expenseAmount.value = entry.amount;
+        elements.expenseCategory.value = entry.category;
+        elements.expenseNotes.value = entry.notes || '';
+        
+        // Update form title
+        elements.formTitle.textContent = 'Editar Despesa';
+      }
+      
+      // Open overlay
+      elements.tripFormOverlay.classList.add('open');
+    }
+
+    function closeForm() {
+      elements.tripFormOverlay.classList.remove('open');
+    }
+
+    function handleFormSubmit() {
+      const entryType = elements.entryType.value;
+      const entryDate = elements.entryDate.value;
+      const entryId = elements.entryId.value || generateId();
+      
+      let entry = {
+        id: entryId,
+        date: entryDate,
+        type: entryType,
+        timestamp: new Date().getTime()
+      };
+      
+      if (entryType === 'trip') {
+        const earnings = parseFloat(elements.tripEarnings.value);
+        const fuelCost = parseFloat(elements.tripFuelCost.value) || 0;
+        const kilometers = parseFloat(elements.tripKilometers.value);
+        const duration = parseInt(elements.tripDuration.value);
+        const tripCount = parseInt(elements.tripCount.value) || 1;
+        const platform = elements.tripPlatform.value;
+        const notes = elements.tripNotes.value;
+        
+        entry = {
+          ...entry,
+          earnings,
+          fuelCost,
+          kilometers,
+          duration,
+          tripCount,
+          platform,
+          notes
+        };
+      } else {
+        const amount = parseFloat(elements.expenseAmount.value);
+        const category = elements.expenseCategory.value;
+        const notes = elements.expenseNotes.value;
+        
+        entry = {
+          ...entry,
+          amount,
+          category,
+          notes
+        };
+      }
+      
+      // Add or update entry
+      if (state.editingId) {
+        const index = state.entries.findIndex(e => e.id === state.editingId);
+        if (index !== -1) {
+          state.entries[index] = entry;
+        }
+      } else {
+        state.entries.push(entry);
+      }
+      
+      // Save data
+      saveData();
+      
+      // Update display
+      updateDisplay();
+      
+      // Close form
+      closeForm();
+    }
+
+    function deleteEntry(id) {
+      if (confirm('Tem certeza que deseja excluir este registro?')) {
+        state.entries = state.entries.filter(entry => entry.id !== id);
+        saveData();
+        updateDisplay();
+      }
+    }
+
+    // Helper Functions
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    function getDisplayDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    function formatCurrency(value) {
+      return value.toLocaleString('pt-BR', { style: 'currency', currency: settings.currency });
+    }
+
+    function formatTime(minutes) {
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+    }
+
+    function updateCurrentDate() {
+      const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+      elements.currentDateEl.textContent = state.currentDate.toLocaleDateString('pt-BR', options);
+    }
+
+    function applyTheme() {
+      if (settings.theme === 'dark' || (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.body.classList.add('dark');
+        elements.themeToggle.innerHTML = '<i data-feather="sun"></i>';
+      } else {
+        document.body.classList.remove('dark');
+        elements.themeToggle.innerHTML = '<i data-feather="moon"></i>';
+      }
+      feather.replace();
+    }
+
+    function getFilteredEntries() {
+      const searchQuery = elements.searchInput.value.toLowerCase();
+      
+      // Apply period filter
+      let periodFilter;
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString().split('T')[0];
+      
+      if (state.currentPeriod === 'daily') {
+        periodFilter = entry => entry.date === today;
+      } else if (state.currentPeriod === 'weekly') {
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        const startDate = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate()).toISOString().split('T')[0];
+        
+        periodFilter = entry => entry.date >= startDate;
+      } else if (state.currentPeriod === 'monthly') {
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+        periodFilter = entry => entry.date >= startOfMonth;
+      } else if (state.currentPeriod === 'yearly') {
+        const startOfYear = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0];
+        periodFilter = entry => entry.date >= startOfYear;
+      }
+      
+      // Apply type filter
+      let typeFilter;
+      if (state.filter === 'trip') {
+        typeFilter = entry => entry.type === 'trip';
+      } else if (state.filter === 'expense') {
+        typeFilter = entry => entry.type === 'expense';
+      } else {
+        typeFilter = () => true;
+      }
+      
+      // Apply search filter
+      const searchFilter = entry => {
+        if (!searchQuery) return true;
+        
+        // Search in different fields based on entry type
+        if (entry.type === 'trip') {
+          return (
+            entry.platform.toLowerCase().includes(searchQuery) ||
+            (entry.notes && entry.notes.toLowerCase().includes(searchQuery))
+          );
+        } else {
+          return (
+            getCategoryName(entry.category).toLowerCase().includes(searchQuery) ||
+            (entry.notes && entry.notes.toLowerCase().includes(searchQuery))
+          );
+        }
+      };
+      
+      return state.entries
+        .filter(periodFilter)
+        .filter(typeFilter)
+        .filter(searchFilter)
+        .sort((a, b) => new Date(b.date) - new Date(a.date) || b.timestamp - a.timestamp);
+    }
+
+    function calculateStats(entries) {
+      // Trip entries
+      const trips = entries.filter(entry => entry.type === 'trip');
+      
+      // Get today's date in ISO format (YYYY-MM-DD)
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Calculate total trip count
+      const totalTripCount = trips.reduce((sum, trip) => sum + (trip.tripCount || 1), 0);
+      
+      // Calculate today's trip count
+      const todayTrips = trips.filter(trip => trip.date === today);
+      const todayTripCount = todayTrips.reduce((sum, trip) => sum + (trip.tripCount || 1), 0);
+      
+      const totalEarnings = trips.reduce((sum, trip) => sum + trip.earnings, 0);
+      const totalFuelCost = trips.reduce((sum, trip) => sum + (trip.fuelCost || 0), 0);
+      const totalKilometers = trips.reduce((sum, trip) => sum + trip.kilometers, 0);
+      const totalMinutes = trips.reduce((sum, trip) => sum + trip.duration, 0);
+      
+      // Expense entries (excluding fuel that's already counted in trips)
+      const nonFuelExpenses = entries.filter(entry => 
+        entry.type === 'expense' && entry.category !== 'fuel'
+      );
+      const totalExpenses = nonFuelExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+      
+      // Fuel expenses entered separately (need to add to total fuel costs)
+      const fuelExpenses = entries.filter(entry => 
+        entry.type === 'expense' && entry.category === 'fuel'
+      );
+      const additionalFuelCost = fuelExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+      
+      // Total fuel cost (from trips + separate fuel expenses)
+      const combinedFuelCost = totalFuelCost + additionalFuelCost;
+      
+      // Calculate balance (earnings - all expenses including fuel)
+      const balance = totalEarnings - totalExpenses - combinedFuelCost;
+      
+      // Calculate averages (avoid division by zero)
+      const earningsPerTrip = totalTripCount > 0 ? totalEarnings / totalTripCount : 0;
+      const earningsPerHour = totalMinutes > 0 ? (totalEarnings / totalMinutes) * 60 : 0;
+      const earningsPerKm = totalKilometers > 0 ? totalEarnings / totalKilometers : 0;
+      const netEarningsPerKm = totalKilometers > 0 ? balance / totalKilometers : 0;
+      
+      return {
+        totalTripCount,
+        todayTripCount,
+        totalEarnings,
+        totalFuelCost: combinedFuelCost,
+        totalExpenses,
+        balance,
+        totalKilometers,
+        totalMinutes,
+        earningsPerTrip,
+        earningsPerHour,
+        earningsPerKm,
+        netEarningsPerKm
+      };
+    }
+
+    function calculateGoalCompletion(stats) {
+      let goal;
+      
+      if (state.currentPeriod === 'daily') {
+        goal = settings.goals.daily;
+      } else if (state.currentPeriod === 'weekly') {
+        goal = settings.goals.weekly;
+      } else if (state.currentPeriod === 'monthly') {
+        goal = settings.goals.monthly;
+      } else {
+        goal = settings.goals.monthly * 12;
+      }
+      
+      // Use the net earnings (lucro líquido) to calculate goal completion
+      const completion = goal > 0 ? Math.min(100, (stats.balance / goal) * 100) : 0;
+      const remaining = Math.max(0, goal - stats.balance);
+      
+      return {
+        goal,
+        completion,
+        remaining
+      };
+    }
+
+    function updateDisplay() {
+      const filteredEntries = getFilteredEntries();
+      const stats = calculateStats(filteredEntries);
+      const goalStats = calculateGoalCompletion(stats);
+      
+      // Update trip counts
+      elements.totalTrips.textContent = stats.totalTripCount;
+      elements.dailyTrips.textContent = stats.todayTripCount;
+      
+      // Update other stats
+      elements.kmDriven.textContent = stats.totalKilometers.toFixed(1);
+      elements.earningsPerTrip.textContent = formatCurrency(stats.earningsPerTrip);
+      elements.earningsPerHour.textContent = formatCurrency(stats.earningsPerHour);
+      elements.earningsPerKm.textContent = formatCurrency(stats.earningsPerKm);
+      elements.netEarningsPerKm.textContent = formatCurrency(stats.netEarningsPerKm);
+      
+      // Update financial summary
+      elements.dailyEarnings.textContent = formatCurrency(stats.totalEarnings);
+      elements.dailyFuel.textContent = formatCurrency(stats.totalFuelCost);
+      elements.dailyExpenses.textContent = formatCurrency(stats.totalExpenses);
+      elements.dailyBalance.textContent = formatCurrency(stats.balance);
+      
+      // Update goal info
+      elements.goalValue.textContent = formatCurrency(goalStats.goal);
+      elements.goalProgressFill.style.width = `${goalStats.completion}%`;
+      elements.goalCompletionPercent.textContent = `${Math.round(goalStats.completion)}% Completo`;
+      elements.goalRemainingValue.textContent = formatCurrency(goalStats.remaining);
+      
+      // Render entries
+      renderEntries();
+    }
+
+    function renderEntries() {
+      const filteredEntries = getFilteredEntries();
+      
+      // Show/hide empty state
+      if (filteredEntries.length === 0) {
+        elements.emptyEntries.style.display = 'block';
+        elements.entriesList.innerHTML = '';
+        elements.entriesList.appendChild(elements.emptyEntries);
+        return;
+      } else {
+        elements.emptyEntries.style.display = 'none';
+      }
+      
+      // Clear current entries
+      elements.entriesList.innerHTML = '';
+      
+      // Render new entries
+      filteredEntries.forEach(entry => {
+        const entryEl = document.createElement('div');
+        entryEl.className = 'entry-card';
+        
+        if (entry.type === 'trip') {
+          // Calculate net earnings (earnings - fuel cost)
+          const fuelCost = entry.fuelCost || 0;
+          const netEarnings = entry.earnings - fuelCost;
+          
+          entryEl.innerHTML = `
+            <div class="entry-header">
+              <div class="entry-date">${getDisplayDate(entry.date)} - ${getCategoryName(entry.platform)}</div>
+              <div class="entry-amount amount-positive">${formatCurrency(entry.earnings)}</div>
+            </div>
+            <div class="entry-details">
+              <div class="entry-detail">
+                <div class="entry-detail-label">Quilômetros</div>
+                <div class="entry-detail-value">${entry.kilometers.toFixed(1)} km</div>
+              </div>
+              <div class="entry-detail">
+                <div class="entry-detail-label">Duração</div>
+                <div class="entry-detail-value">${formatTime(entry.duration)}</div>
+              </div>
+              <div class="entry-detail">
+                <div class="entry-detail-label">Viagens</div>
+                <div class="entry-detail-value">${entry.tripCount || 1}</div>
+              </div>
+              <div class="entry-detail">
+                <div class="entry-detail-label">Combustível</div>
+                <div class="entry-detail-value" style="color: var(--destructive);">${formatCurrency(fuelCost)}</div>
+              </div>
+              <div class="entry-detail">
+                <div class="entry-detail-label">Lucro Líquido</div>
+                <div class="entry-detail-value" style="color: var(--success);">${formatCurrency(netEarnings)}</div>
+              </div>
+              <div class="entry-detail">
+                <div class="entry-detail-label">Ganho/KM</div>
+                <div class="entry-detail-value">${formatCurrency(entry.kilometers > 0 ? entry.earnings / entry.kilometers : 0)}</div>
+              </div>
+            </div>
+            ${entry.notes ? `<div class="entry-note">${entry.notes}</div>` : ''}
+            <div class="entry-actions">
+              <button class="entry-button entry-button-edit" onclick="editEntry('${entry.id}')">
+                <i data-feather="edit"></i>
+                <span>Editar</span>
+              </button>
+              <button class="entry-button entry-button-delete" onclick="deleteEntry('${entry.id}')">
+                <i data-feather="trash-2"></i>
+                <span>Excluir</span>
+              </button>
+            </div>
+          `;
+        } else {
+          entryEl.innerHTML = `
+            <div class="entry-header">
+              <div class="entry-date">${getDisplayDate(entry.date)} - ${getCategoryName(entry.category)}</div>
+              <div class="entry-amount amount-negative">${formatCurrency(entry.amount)}</div>
+            </div>
+            ${entry.notes ? `<div class="entry-note">${entry.notes}</div>` : ''}
+            <div class="entry-actions">
+              <button class="entry-button entry-button-edit" onclick="editEntry('${entry.id}')">
+                <i data-feather="edit"></i>
+                <span>Editar</span>
+              </button>
+              <button class="entry-button entry-button-delete" onclick="deleteEntry('${entry.id}')">
+                <i data-feather="trash-2"></i>
+                <span>Excluir</span>
+              </button>
+            </div>
+          `;
+        }
+        
+        elements.entriesList.appendChild(entryEl);
+      });
+      
+      // Re-initialize feather icons for the dynamic content
+      feather.replace();
+    }
+
+    function getCategoryName(categoryKey) {
+      const categories = {
+        // Platforms
+        'uber': 'Uber',
+        '99': '99',
+        'other': 'Outra',
+        // Expense categories
+        'fuel': 'Combustível',
+        'maintenance': 'Manutenção',
+        'food': 'Alimentação',
+        'carWash': 'Lavagem',
+        'toll': 'Pedágio',
+        'other': 'Outra'
+      };
+      
+      return categories[categoryKey] || categoryKey;
+    }
+
+    // Edit entry function - make it available globally
+    function editEntry(id) {
+      const entry = state.entries.find(e => e.id === id);
+      if (entry) {
+        openEditForm(entry);
+      }
+    }
+
+    // Make functions available globally for event handlers in HTML
+    window.editEntry = editEntry;
+    window.deleteEntry = deleteEntry;
+
+    // Initialize app when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      initApp();
+      feather.replace();
+    });
+  </script>
+</body>
+</html>
